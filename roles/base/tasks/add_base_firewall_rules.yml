@@ -1,0 +1,9 @@
+- name : Enable UFW and close all ports
+  ufw: state=enabled policy=deny
+
+- name : Allow all access to tcp port 2200, 80 and 443
+  ufw:
+    rule: allow
+    port: "{{item}}"
+    proto: tcp
+  with_items: open_port

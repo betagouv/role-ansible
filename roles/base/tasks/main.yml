@@ -1,0 +1,17 @@
+- include: setup_various_machine_variables.yml
+  tags: setup_various_machine_variables
+
+- include: add_base_user.yml
+  tags: add_base_user
+
+- include: ssh_bootstrap.yml
+  tags: ssh_bootstrap
+
+- include: install_base_packages.yml
+  tags: install_base_packages
+
+- include: add_base_firewall_rules.yml
+  tags: add_base_firewall_rules
+
+- include: remove_old_users.yml
+  tags: remove_old_users

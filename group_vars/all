@@ -1,0 +1,7 @@
+git_host: 127.0.0.1
+var_user: []
+
+deploy_password: ""
+root_password: ""
+
+ssh_keys: []

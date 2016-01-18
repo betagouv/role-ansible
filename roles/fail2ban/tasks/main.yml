@@ -1,0 +1,13 @@
+- name: Install fail2ban
+  apt: name=fail2ban state=present
+
+- name: Enable autorestart fail2ban
+  service: name=fail2ban enabled=true
+
+- name: Copy http-get-dos file
+  copy: src=http-get-dos.conf dest=/etc/fail2ban/filter.d
+  notify: restart fail2ban
+
+- name: Copy jail.conf
+  template: src=jail.conf.j2 dest=/etc/fail2ban/jail.conf
+  notify: restart fail2ban

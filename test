@@ -1,0 +1,16 @@
+[sf]
+192.168.56.30 ansible_user=vagrant
+
+[elk]
+192.168.56.31 ansible_user=vagrant
+
+
+[all:children]
+sf
+elk
+
+[all:vars]
+deploy_user=vagrant
+allow_root_password_authentication=false
+allow_root_ssh_login=false
+ssh_port=22

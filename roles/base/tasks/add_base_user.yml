@@ -1,0 +1,14 @@
+- name: Set root password
+  user:
+    name: root
+    password: "{{ root_password |password_hash('sha512') }}"
+  tags: current
+
+
+- name: Set bashrc file for root
+  template:
+    src: roles/user/templates/bashrc
+    dest: /root/.bashrc
+    owner: root
+    group: root
+  tags: current

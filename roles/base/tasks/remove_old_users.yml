@@ -1,0 +1,11 @@
+- name: Remove old users
+  user:
+    name: "{{ item }}"
+    state: absent
+  with_items: "{{ user_to_remove }}"
+
+- name: Remove old home
+  file:
+    path: /home/{{ item }}
+    state: absent
+  with_items: "{{ user_to_remove }}"

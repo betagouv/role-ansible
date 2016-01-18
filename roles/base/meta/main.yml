@@ -1,0 +1,3 @@
+dependencies:
+- { role : user, username: '{{ deploy_user }}', password: '{{ deploy_password }}' }
+- { role : fail2ban, tags: ['fail2ban'] }

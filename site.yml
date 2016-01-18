@@ -1,0 +1,12 @@
+---
+
+- hosts: sf
+  become: true
+  roles:
+    - base
+
+
+- hosts: elk
+  become: true
+  roles:
+    - base

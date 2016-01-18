@@ -1,0 +1,26 @@
+COMMON_LOG_DIR: "/var/www/log"
+allow_root_password_authentication: false
+allow_root_ssh_login: false
+common_debian_pkgs:
+  - ntp
+  - ack-grep
+  - lynx-cur
+  - logrotate
+  - mosh
+  - rsyslog
+  - screen
+  - tree
+  - unzip
+  - python2.7
+  - python-pip
+  - python2.7-dev
+  - curl
+
+deploy_user: vagrant
+
+user_to_remove: []
+
+open_port:
+  - "{{ ssh_port }}"
+  - 443
+  - 80

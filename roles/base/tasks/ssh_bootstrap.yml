@@ -1,0 +1,26 @@
+- name: Disallow password authentication
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^PasswordAuthentication"
+    line: "PasswordAuthentication {{ allow_root_password_authentication | ternary('yes','no') }}"
+    state: present
+  notify: restart ssh
+
+- name: Disallow root SSH access
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^PermitRootLogin"
+    line: "PermitRootLogin {{ allow_root_ssh_login | ternary('Yes','No') }}"
+    state: present
+  notify: restart ssh
+  remote_user: "{{ deploy_user }}"
+
+- name: change SSHD port
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^Port 22"
+    line: "Port {{ ssh_port }}"
+    state: present
+  notify:
+    - restart ssh
+  remote_user: "{{ deploy_user }}"

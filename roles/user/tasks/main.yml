@@ -1,0 +1,56 @@
+
+- include_vars: "secrets/{{ item }}-user.yml"
+  with_items: "{{ var_user }}"
+  tags: user
+
+- name: Add user
+  user:
+    name: "{{ username }}"
+    shell: /bin/bash
+    state: present
+  tags: user
+
+- name: Create deploy user
+  user:
+    name: "{{ username }}"
+    groups: sudo
+    shell: /bin/bash
+    password: "{{ password |password_hash('sha512')}}"
+    state: present
+  when: password is defined
+  tags: user
+
+- name: Create .ssh folder
+  file:
+    path: /home/{{ username }}/.ssh
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0700
+    state: directory
+  tags: user
+
+- name: add ssh keys for users
+  authorized_key:
+    user: "{{ username }}"
+    key: "{{ lookup('file', 'public_keys/users/' + item ) }}"
+    state: present
+  with_items: ssh_keys
+  tags: user
+
+- name: Add bashrc
+  template:
+    src: bashrc
+    dest: /home/{{ username }}/.bashrc
+    mode: 0644
+    owner: "{{ username }}"
+    group: "{{ username }}"
+  tags: user
+
+- name: Add known_hosts
+  template:
+    src: known_hosts
+    dest: /home/{{username}}/.ssh/known_hosts
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+  tags: user
