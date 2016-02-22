@@ -1,0 +1,81 @@
+---
+
+  - name: create binary folder
+    file:
+      state: directory
+      path: "{{ es_folder }}"
+    tags:
+      - es
+
+  - name: Set es user
+    user:
+      name: "{{ es_user }}"
+    tags:
+      - es
+
+  - name: create data directory
+    file:
+      state: directory
+      path: "{{ es_data_directory }}"
+      owner: "{{ es_user }}"
+      group: "{{ es_user }}"
+      mode: 0750
+    tags:
+      - es
+
+  - name: Get debian package
+    get_url:
+      url: "{{ es_url_deb }}"
+      dest: "{{ es_binary }}"
+    register: logstash_debian_package
+    tags:
+      - es
+
+  - name: install the debian package
+    apt:
+      deb: "{{ es_binary }}"
+    when: logstash_debian_package.changed
+    tags:
+      - es
+
+  - name: config ES
+    template:
+      src: elasticsearch.yml.j2
+      dest: /etc/elasticsearch/elasticsearch.yml
+      owner: root
+      group: elasticsearch
+      mode: 750
+    notify: restart elasticsearch
+    tags:
+      - es
+
+  - name: ensure elasticsearch service startup at boot
+    service:
+      name: elasticsearch
+      enabled: yes
+      state: started
+    tags:
+      - es
+
+
+  - name: create es vhost
+    template:
+      src: vhost.j2
+      dest: /etc/nginx/sites-available/20-es.conf
+    notify: restart nginx
+    tags:
+      - vhost
+      - es
+
+
+  - name: enable vhost
+    file:
+      src: /etc/nginx/sites-available/20-es.conf
+      dest: /etc/nginx/sites-enabled/20-es.conf
+      state: link
+    notify: restart nginx
+    tags:
+      - vhost
+      - es
+
+  - include: plugins.yml
