@@ -5,3 +5,7 @@ deploy_password: ""
 root_password: ""
 
 ssh_keys: []
+
+basic_auth_path: "/etc/htpasswd/.htpasswd"
+basic_auth_name: "sgmap"
+basic_auth_password: "sgmap"

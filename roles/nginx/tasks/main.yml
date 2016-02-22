@@ -1,0 +1,48 @@
+---
+
+- name: Define nginx_user.
+  set_fact:
+    nginx_user: "{{ __nginx_user }}"
+  when: nginx_user is not defined
+  tags: nginx
+
+- name: Add nginx repository
+  apt_repository:
+    repo: 'ppa:nginx/stable'
+    update_cache: yes
+  tags: nginx
+
+- name: Ensure nginx is installed.
+  apt:
+    pkg: nginx
+    state: latest
+    default_release: "{{ nginx_default_release }}"
+  tags: nginx
+
+
+# Nginx setup.
+- name: Copy nginx configuration in place.
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart nginx
+  tags: nginx
+
+- name: Ensure nginx is started and enabled to start at boot.
+  service: name=nginx state=started enabled=yes
+  tags: nginx
+
+- include: basic-auth.yml
+  tags: nginx
+
+- include: vhosts.yml
+  tags:
+    - nginx
+    - vhost
+
+- name: ensure nginx is started
+  service: name=nginx state=started
+  tags: nginx
