@@ -4,6 +4,8 @@
   become: true
   roles:
     - base
+    - docker
+    - ansible
 
 
 - hosts: elk
