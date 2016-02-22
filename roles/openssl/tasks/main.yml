@@ -11,13 +11,13 @@
  - stat: path={{ssl_certs_local_privkey_path}}
    register: stat_privkey
    connection: local
-   sudo: false
+   become: false
    tags: [ssl-certs,configuration]
 
  - stat: path={{ssl_certs_local_cert_path}}
    register: stat_cert
    connection: local
-   sudo: false
+   become: false
    tags: [ssl-certs,configuration]
 
  - name: Test if privkey file is needed
