@@ -1,0 +1,18 @@
+---
+- name: Install exim
+  apt: name=exim4 state=installed
+  tags: exim
+
+- name: update exim4 configuration
+  template:
+    src: update-exim4.conf.conf.j2
+    dest: /etc/exim4/update-exim4.conf.conf
+  notify: restart exim
+  tags: exim
+
+
+- name: ensure exim service is started
+  service:
+    name: exim4
+    state: started
+  tags: exim
