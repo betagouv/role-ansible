@@ -3,7 +3,7 @@
 - hosts: sf
   become: true
   roles:
-    - base
+    - ufw
     - dockerRegistry
     - ansible
     - exim
@@ -18,6 +18,6 @@
 - hosts: elk
   become: true
   roles:
-    - base
+    - ufw
     - elasticsearch
     - kibana

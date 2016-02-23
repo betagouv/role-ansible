@@ -26,3 +26,10 @@ jenkins_plugin_slack_room: ""
 sentry_db_password: sentry
 sentry_host: stest.sgmap.fr
 sentry_secret_key: il6j#!$tu=$bety8+c#8*0_!rerr^mzf*(4-nwtg6$uf2336m*
+
+
+open_port:
+  - "{{ ssh_port }}"
+  - 443
+  - 80
+  - "{{ gogs_ssh_port }}"
