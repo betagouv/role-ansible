@@ -2,3 +2,5 @@
 es_install_plugins:
   - name: hq
     path: royrusso/elasticsearch-HQ
+
+kibana_host: ktest.sgmap.fr
