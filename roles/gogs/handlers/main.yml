@@ -1,0 +1,7 @@
+---
+
+- name: restart gogs
+  shell: docker-compose restart
+  args:
+    chdir: "{{ gogs_root_path }}"
+  tags: gogs

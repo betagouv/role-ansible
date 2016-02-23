@@ -1,0 +1,56 @@
+---
+
+  - name: create gogs data directory
+    file:
+      path: "{{ item }}"
+      state: directory
+      mode: 0755
+    tags: gogs
+    with_items:
+      - "{{ gogs_root_path }}"
+      - "{{ gogs_data_path }}"
+
+
+  - name: set docker-compose
+    template:
+      src: docker-compose.yml.j2
+      dest: "{{ gogs_compose_path }}"
+      mode: 0700
+    notify: restart gogs
+    tags: gogs
+
+
+  - name: check if the containers is running
+    shell: docker-compose ps
+    args:
+      chdir: "{{ gogs_root_path }}"
+    register: gogsIsRunning
+    changed_when: false
+    tags: gogs
+
+  - name: start gogs
+    shell: docker-compose up -d
+    args:
+      chdir: "{{ gogs_root_path }}"
+    when: (gogsIsRunning.stdout_lines | length) == 2
+    tags: gogs
+
+
+  - name: create gogs vhost
+    template:
+      src: vhost.j2
+      dest: /etc/nginx/sites-available/55-gogs.conf
+    notify: restart nginx
+    tags:
+      - vhost
+      - gogs
+
+  - name: enable gogs vhost
+    file:
+      src: /etc/nginx/sites-available/55-gogs.conf
+      dest: /etc/nginx/sites-enabled/55-gogs.conf
+      state: link
+    notify: restart nginx
+    tags:
+      - vhost
+      - gogs

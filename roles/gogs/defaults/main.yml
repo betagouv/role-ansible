@@ -1,0 +1,6 @@
+gogs_root_path: /srv/docker/gogs
+gogs_compose_path: "{{ gogs_root_path }}/docker-compose.yml"
+gogs_data_path: "{{ gogs_root_path }}/data"
+
+gogs_http_port: "6798"
+gogs_ssh_port: "22"

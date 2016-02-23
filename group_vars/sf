@@ -1,5 +1,8 @@
 registry_hostname: rtest.sgmap.fr
 
+gogs_ssh_port: 9873
+gogs_host: gtest.sgmap.fr
+
 docker_opts: >
     --insecure-registry localhost:{{ registry_port }}
 
