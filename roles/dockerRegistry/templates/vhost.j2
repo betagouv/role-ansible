@@ -1,0 +1,33 @@
+server {
+    listen 443;
+
+    server_name {{ registry_hostname }};
+
+    ssl on;
+    ssl_certificate {{ ssl_certs_cert_path }};
+    ssl_certificate_key {{ ssl_certs_privkey_path }};
+
+    auth_basic "Restricted";
+    auth_basic_user_file {{ basic_auth_path }};
+
+    location / {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+
+        add_header 'Docker-Distribution-Api-Version' 'registry/2.0' always;
+
+    }
+}
+
+
+server {
+  listen 80;
+  server_name {{ registry_hostname }};
+
+
+  return         301 https://$server_name$request_uri;
+}

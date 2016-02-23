@@ -1,0 +1,38 @@
+
+---
+
+- name: prepare registry file system
+  file:
+      path: "{{ docker_registry_data }}"
+      state: directory
+  tags: registry
+
+- name: Run registry container
+  docker:
+      name: registry
+      image: "registry:2.1.1"
+      ports: "{{ registry_port }}:5000"
+      restart_policy: always
+      state: reloaded
+      env:
+        REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /var/lib/registry
+      volumes:
+        - "{{ docker_registry_data }}:/var/lib/registry"
+  tags: registry
+
+
+- name: create regsitry vhost
+  template:
+    src: vhost.j2
+    dest: /etc/nginx/sites-available/10-registry.conf
+  notify: restart nginx
+  tags: vhost
+
+- name: enable vhost
+  file:
+    src: /etc/nginx/sites-available/10-registry.conf
+    dest: /etc/nginx/sites-enabled/10-registry.conf
+    state: link
+  notify: restart nginx
+  tags: vhost
+  

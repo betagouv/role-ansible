@@ -1,0 +1,4 @@
+---
+
+docker_registry_data: /docker/registry/data
+registry_port: 5000

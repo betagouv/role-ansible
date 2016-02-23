@@ -1,0 +1,6 @@
+registry_hostname: rtest.sgmap.fr
+
+docker_opts: >
+    --insecure-registry localhost:{{ registry_port }}
+
+docker_group_members: [ "{{ deploy_user }}" ]
