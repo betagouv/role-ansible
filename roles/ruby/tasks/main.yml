@@ -1,0 +1,16 @@
+---
+  - name: install
+    apt:
+      name: "{{ item }}"
+      update_cache: yes
+    tags: ruby
+    with_items:
+      - ruby
+      - ruby-dev
+
+  - name: install gems
+    gem:
+      name: "{{ item }}"
+      state: latest
+    with_items: ruby_package
+    tags: ruby
