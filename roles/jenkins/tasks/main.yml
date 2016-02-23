@@ -1,0 +1,9 @@
+---
+- include: jenkins.yml
+  tags: jenkins
+
+- include: ssh-key.yml
+  tags: jenkins
+
+- include: nginx.yml
+  tags: jenkins

@@ -4,9 +4,11 @@
   become: true
   roles:
     - base
-    - docker
+    - dockerRegistry
     - ansible
     - exim
+    - gogs
+    - jenkins
 
 
 - hosts: elk
@@ -14,3 +16,4 @@
   roles:
     - base
     - elasticsearch
+    - kibana

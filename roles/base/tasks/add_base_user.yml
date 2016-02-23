@@ -2,7 +2,6 @@
   user:
     name: root
     password: "{{ root_password |password_hash('sha512') }}"
-  tags: current
 
 
 - name: Set bashrc file for root
@@ -11,4 +10,3 @@
     dest: /root/.bashrc
     owner: root
     group: root
-  tags: current

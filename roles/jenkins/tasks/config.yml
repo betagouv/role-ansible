@@ -1,0 +1,94 @@
+---
+
+- name: Configure Jenkins Port
+  lineinfile: dest=/etc/default/jenkins regexp=^HTTP_PORT= line=HTTP_PORT={{ jenkins_port }}
+  register: config_changed
+
+- name: Restart jenkins now
+  service: name=jenkins state=restarted
+  when: config_changed.changed
+
+- name: Configure Jenkins Prefix
+  when: prefix is defined
+  lineinfile: dest=/etc/default/jenkins regexp=^PREFIX= line=PREFIX={{prefix}}
+  register: config_changed
+
+- name: Configure Jenkins JAVA_ARGS
+  lineinfile:
+    dest: /etc/default/jenkins
+    regexp: ^JAVA_ARGS=
+    line: JAVA_ARGS="-Djava.awt.headless=true -Dhudson.model.DirectoryBrowserSupport.CSP=\"\""
+  register: config_changed
+
+- name: Restart jenkins now
+  service: name=jenkins state=restarted
+  when: config_changed.changed
+
+- name: Configure Jenkins Prefix
+  when: prefix is defined
+  lineinfile:
+    dest: /etc/default/jenkins
+    regexp: ^JENKINS_ARGS=
+    line: "JENKINS_ARGS=\"--webroot=/var/cache/$NAME/war --httpPort=$HTTP_PORT --ajp13Port=$AJP_PORT --prefix=$PREFIX\""
+  register: config_changed
+
+- name: Configure Jenkins Prefix
+  when: prefix is not defined
+  lineinfile:
+    dest: /etc/default/jenkins
+    regexp: ^JENKINS_ARGS=
+    line: "JENKINS_ARGS=\"--webroot=/var/cache/$NAME/war --httpPort=$HTTP_PORT --ajp13Port=$AJP_PORT\""
+  register: config_changed
+
+- name: Restart jenkins now
+  service: name=jenkins state=restarted
+  when: config_changed.changed
+
+- name: configure jenkins
+  template:
+    src: "config.xml.j2"
+    dest: "/var/lib/jenkins/config.xml"
+    owner: jenkins
+    group: jenkins
+  tags: jenkins_view
+  notify: Restart Jenkins
+
+- name: configure credentials
+  template:
+    src: "credentials.xml.j2"
+    dest: "/var/lib/jenkins/credentials.xml"
+    owner: jenkins
+    group: jenkins
+  notify: Restart Jenkins
+
+- name: configure github-plugin-configuration
+  template:
+    src: "github-plugin-configuration.xml.j2"
+    dest: "/var/lib/jenkins/github-plugin-configuration.xml"
+    owner: jenkins
+    group: jenkins
+  notify: Restart Jenkins
+
+
+- name: configure github-plugin-configuration
+  template:
+    src: "jenkins.plugins.slack.SlackNotifier.xml.j2"
+    dest: "/var/lib/jenkins/jenkins.plugins.slack.SlackNotifier.xml"
+    owner: jenkins
+    group: jenkins
+  notify: Restart Jenkins
+
+- name: Configure Jenkins E-mail
+  when: email is defined
+  template: src=hudson.tasks.Mailer.xml.j2 dest={{ jenkins_lib }}/hudson.tasks.Mailer.xml owner=jenkins group=jenkins mode=0644
+  notify: Restart Jenkins
+
+
+- name: Configure Docker Url
+  template:
+    src: org.jenkinsci.plugins.dockerbuildstep.DockerBuilder.xml.j2
+    dest: "{{ jenkins_lib }}/org.jenkinsci.plugins.dockerbuildstep.DockerBuilder.xml"
+    owner: jenkins
+    group: jenkins
+    mode: 0644
+  notify: Restart Jenkins

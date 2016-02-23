@@ -1,0 +1,17 @@
+- name: create jenkins vhost
+  template:
+    src: vhost.j2
+    dest: /etc/nginx/sites-available/45-jenkins.conf
+  notify: restart nginx
+  tags:
+    - vhost
+
+
+- name: enable vhost
+  file:
+    src: /etc/nginx/sites-available/45-jenkins.conf
+    dest: /etc/nginx/sites-enabled/45-jenkins.conf
+    state: link
+  notify: restart nginx
+  tags:
+    - vhost

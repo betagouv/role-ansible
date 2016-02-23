@@ -7,3 +7,18 @@ docker_opts: >
     --insecure-registry localhost:{{ registry_port }}
 
 docker_group_members: [ "{{ deploy_user }}" ]
+
+jenkins_plugins:
+ - 'git'
+ - 'github'
+ - 'parameterized-trigger'
+ - 'greenballs'
+ - 'chucknorris'
+ - 'htmlpublisher'
+ - 'slack'
+ - 'delivery-pipeline-plugin'
+
+jenkins_plugin_github_id: ""
+jenkins_plugin_slack_team: ""
+jenkins_plugin_slack_token: ""
+jenkins_plugin_slack_room: ""

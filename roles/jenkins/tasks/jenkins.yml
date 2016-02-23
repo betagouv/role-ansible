@@ -1,0 +1,19 @@
+---
+- include: repo.yml
+
+
+- name: Install Jenkins
+  apt: name=jenkins state=latest
+  register: jenkins_install
+
+- name: Restart jenkins now
+  service: name=jenkins state=started
+
+
+- include: config.yml
+
+- include: cli.yml
+
+- include: plugins.yml
+
+- include: config.yml

@@ -1,0 +1,2 @@
+---
+dependencies: [java, exim, docker, nginx]
