@@ -1,0 +1,6 @@
+play_version: 1.4.1
+play_source: https://downloads.typesafe.com/play/{{ play_version }}/play-{{ play_version }}.zip
+play_root_dir: /opt/play
+play_archive: "{{ play_root_dir }}/play-{{ play_version }}.zip"
+play_path_version: "{{ play_root_dir }}/play-{{ play_version }}"
+play_path_current: "{{ play_root_dir }}/play"

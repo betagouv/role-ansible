@@ -1,0 +1,34 @@
+- name: create play directory
+  file:
+    dest: "{{ play_root_dir }}"
+    state: directory
+    mode: 0755
+  tags: play1
+
+- name: download play framework when needed
+  command: wget {{ play_source }}
+  args:
+    chdir: "{{ play_root_dir }}"
+    creates: "{{ play_path_version }}"
+  tags: play1
+
+- name: check play script presence
+  stat: path="{{ play_path_version }}/play"
+  register: file_stats_play_script
+  tags: play1
+
+- name: unzip play framework
+  unarchive:
+    src: "{{ play_archive }}"
+    dest: "{{ play_root_dir }}"
+    copy: no
+  when: not file_stats_play_script.stat.exists
+  tags: play1
+
+- name: create sim link to current play
+  file:
+    src: "{{ play_path_version }}"
+    dest: "{{ play_path_current }}"
+    state: link
+    mode: 0755
+  tags: play1
