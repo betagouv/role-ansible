@@ -1,0 +1,11 @@
+sentry_db_name: sentryhq_production
+sentry_db_user: sentry
+
+sentry_db_password: sentrypasswordToto
+sentry_postgresql_data: /srv/docker/sentry/postgre
+sentry_redis_data: /srv/docker/sentry/redis
+sentry_sentry_conf: /srv/docker/sentry/conf
+sentry_secret: Rn8jBVL+yW6HNsjbVDTBBfwJTwyDahG/RUH7fKHHjZ86LBnd4ahJ2A==
+sentry_http_port: 10081
+
+sentry_email: infra@sgmap.com

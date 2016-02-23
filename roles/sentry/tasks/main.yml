@@ -1,0 +1,172 @@
+---
+
+  - name: create postegreSQL data volumes
+    file:
+      path: "{{ sentry_postgresql_data }}"
+      state: directory
+      mode: 0755
+    tags:
+      - sentry
+      - sentrySetup
+    register: newPosgre
+
+
+  - name: Run postgresql container
+    docker:
+        name: sentry-postgres
+        image: "postgres"
+        restart_policy: always
+        state: started
+        env:
+          DB_NAME: "{{ sentry_db_name }}"
+          DB_USER: "{{ sentry_db_user }}"
+          DB_PASS: "{{ sentry_db_password }}"
+        volumes:
+          - "{{ sentry_postgresql_data }}:/var/lib/postgresql"
+    tags:
+      - sentry
+      - sentrySetup
+
+  - name: create redis data volumes
+    file:
+      path: "{{ sentry_redis_data }}"
+      state: directory
+      mode: 0755
+    tags:
+      - sentry
+      - sentrySetup
+
+  - name: Run redis container
+    docker:
+        name: sentry-redis
+        image: "redis"
+        restart_policy: always
+        state: started
+        volumes:
+          - "{{ sentry_redis_data }}:/var/lib/redis"
+    tags:
+      - sentry
+      - sentrySetup
+
+
+  - name: create sentry conf
+    file:
+      path: "{{ sentry_sentry_conf }}"
+      state: directory
+      mode: 0777
+    tags:
+      - sentry
+      - sentrySetup
+
+  - name: add sentry template
+    template:
+      src: conf.py.j2
+      dest: "{{ sentry_sentry_conf }}/sentry.conf.py"
+      mode: 0777
+    tags:
+      - sentry
+      - sentrySetup
+
+  - name: wait for DB to start
+    pause: seconds=15
+    tags:
+      - sentry
+      - sentrySetup
+
+  - name: Run sentry container
+    docker:
+        name: sentry
+        image: sentry
+        command: sentry --config /etc/sentry start
+        restart_policy: always
+        links:
+          - sentry-redis:redis
+          - sentry-postgres:postgres
+        env:
+          SENTRY_SECRET_KEY: "{{ sentry_secret_key }}"
+          SENTRY_CONF: /etc/sentry
+        volumes:
+          - "{{ sentry_sentry_conf }}/:/etc/sentry/"
+        state: started
+        ports:
+          - "{{ sentry_http_port }}:9000"
+    tags:
+      - sentry
+      - sentrySetup
+
+  - name: Run sentry data migration
+    docker:
+        name: sentry-migration
+        image: sentry
+        command: sentry upgrade --noinput
+        detach: False
+        links:
+          - sentry-redis:redis
+          - sentry-postgres:postgres
+        env:
+          SENTRY_SECRET_KEY: "{{ sentry_secret_key }}"
+        volumes:
+          - "{{ sentry_sentry_conf }}/sentry.conf.py:/home/user/.sentry/sentry.conf.py"
+        state: started
+    tags: sentry
+
+  - name: wait for data migration
+    shell: docker wait sentry-migration
+    tags: sentry
+
+
+  - name: Run sentry celery beat container
+    docker:
+        name: sentry-celery-beat
+        image: sentry
+        command: sentry celery beat
+        restart_policy: always
+        env:
+          SENTRY_SECRET_KEY: "{{ sentry_secret_key }}"
+        volumes:
+          - "{{ sentry_sentry_conf }}/sentry.conf.py:/home/user/.sentry/sentry.conf.py"
+        links:
+          - sentry-redis:redis
+          - sentry-postgres:postgres
+        state: started
+    tags:
+      - sentry
+      - sentry2
+
+
+  - name: Run sentry celery worker container
+    docker:
+        name: sentry-celery-worker
+        image: sentry
+        command: sentry celery worker
+        env:
+          SENTRY_SECRET_KEY: "{{ sentry_secret_key }}"
+        volumes:
+          - "{{ sentry_sentry_conf }}/sentry.conf.py:/home/user/.sentry/sentry.conf.py"
+        restart_policy: always
+        links:
+          - sentry-redis:redis
+          - sentry-postgres:postgres
+        state: started
+    tags:
+      - sentry
+      - sentry2
+
+  - name: create sentry vhost
+    template:
+      src: vhost.j2
+      dest: /etc/nginx/sites-available/50-sentry.conf
+    notify: restart nginx
+    tags:
+      - vhost
+      - sentry
+
+  - name: enable vhost
+    file:
+      src: /etc/nginx/sites-available/50-sentry.conf
+      dest: /etc/nginx/sites-enabled/50-sentry.conf
+      state: link
+    notify: restart nginx
+    tags:
+      - vhost
+      - sentry

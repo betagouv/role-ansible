@@ -9,6 +9,10 @@
     - exim
     - gogs
     - jenkins
+    - ruby
+    - play1
+    - nodejs
+    - sentry
 
 
 - hosts: elk
