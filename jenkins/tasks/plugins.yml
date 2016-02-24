@@ -8,7 +8,7 @@
 
 - name: List plugins
   shell: java -jar {{ jenkins.cli_dest }} -s http://localhost:{{ jenkins_port }} list-plugins | cut -f 1 -d ' '
-  when: plugins is defined
+  when: jenkins_plugins is defined
   register: plugins_installed
 
 - name: Install/update plugins
